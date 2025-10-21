@@ -39,6 +39,13 @@ const PRESETS: &[ModelPreset] = &[
         effort: Some(ReasoningEffort::High),
     },
     ModelPreset {
+        id: "gpt-5-pro",
+        label: "gpt-5 pro",
+        description: "Premium GPT-5 reasoning with extended depth and tools.",
+        model: "gpt-5-pro",
+        effort: Some(ReasoningEffort::Medium),
+    },
+    ModelPreset {
         id: "gpt-5-minimal",
         label: "gpt-5 minimal",
         description: "Fastest responses with little reasoning",
