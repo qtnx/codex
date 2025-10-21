@@ -125,6 +125,35 @@ impl ModelProviderInfo {
         Ok(self.apply_http_headers(builder))
     }
 
+    /// Returns a clone of this provider with `base_url` forced to the given value.
+    pub fn clone_with_base_url(&self, base_url: impl Into<String>) -> Self {
+        let mut cloned = self.clone();
+        cloned.base_url = Some(base_url.into());
+        cloned
+    }
+
+    /// Apply any model- and auth-specific overrides and return the effective provider.
+    pub fn with_model_auth_overrides(
+        &self,
+        model_slug: &str,
+        auth: Option<&CodexAuth>,
+    ) -> ModelProviderInfo {
+        if model_slug == "gpt-5-pro"
+            && let Some(auth) = auth
+            && auth.mode == AuthMode::ChatGPT
+        {
+            return self.clone_with_base_url("https://api.openai.com/v1");
+        }
+
+        self.clone()
+    }
+
+    /// Returns the full request URL for the provider given the provided auth context.
+    pub fn full_url_for_auth(&self, auth: Option<&CodexAuth>) -> String {
+        let owned = auth.cloned();
+        self.get_full_url(&owned)
+    }
+
     fn get_query_string(&self) -> String {
         self.query_params
             .as_ref()

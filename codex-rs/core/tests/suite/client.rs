@@ -1232,6 +1232,45 @@ fn create_dummy_codex_auth() -> CodexAuth {
     CodexAuth::create_dummy_chatgpt_auth_for_testing()
 }
 
+#[test]
+fn gpt5_pro_chatgpt_auth_uses_openai_api_base() {
+    let built_in = built_in_model_providers()["openai"].clone();
+    let provider = ModelProviderInfo {
+        base_url: None,
+        ..built_in
+    };
+
+    let auth = Some(create_dummy_codex_auth());
+    let effective = provider.with_model_auth_overrides("gpt-5-pro", auth.as_ref());
+
+    pretty_assertions::assert_eq!(
+        effective.base_url.as_deref(),
+        Some("https://api.openai.com/v1"),
+    );
+    pretty_assertions::assert_eq!(
+        effective.full_url_for_auth(auth.as_ref()),
+        "https://api.openai.com/v1/responses",
+    );
+}
+
+#[test]
+fn chatgpt_auth_non_pro_models_use_chatgpt_backend_base() {
+    let built_in = built_in_model_providers()["openai"].clone();
+    let provider = ModelProviderInfo {
+        base_url: None,
+        ..built_in
+    };
+
+    let auth = Some(create_dummy_codex_auth());
+    let effective = provider.with_model_auth_overrides("gpt-5-codex", auth.as_ref());
+
+    pretty_assertions::assert_eq!(effective.base_url, provider.base_url);
+    pretty_assertions::assert_eq!(
+        effective.full_url_for_auth(auth.as_ref()),
+        "https://chatgpt.com/backend-api/codex/responses",
+    );
+}
+
 /// Scenario:
 /// - Turn 1: user sends U1; model streams deltas then a final assistant message A.
 /// - Turn 2: user sends U2; model streams a delta then the same final assistant message A.

@@ -36,6 +36,9 @@ The model that Codex should use.
 model = "gpt-5-pro"  # overrides the default ("gpt-5-codex" on macOS/Linux, "gpt-5" on Windows)
 ```
 
+> [!NOTE]
+> When you select `gpt-5-pro` while signed in with ChatGPT credentials, Codex automatically sends requests to the OpenAI API base (`https://api.openai.com/v1`) instead of the ChatGPT backend.
+
 ### model_providers
 
 This option lets you add to the default set of model providers bundled with Codex. The map key becomes the value you use with `model_provider` to select the provider.

@@ -139,12 +139,18 @@ impl ModelClient {
         match self.provider.wire_api {
             WireApi::Responses => self.stream_responses(prompt, task_kind).await,
             WireApi::Chat => {
+                let provider = {
+                    let auth = self.auth_manager.as_ref().and_then(|m| m.auth());
+                    self.provider
+                        .with_model_auth_overrides(&self.config.model, auth.as_ref())
+                };
+
                 // Create the raw streaming connection first.
                 let response_stream = stream_chat_completions(
                     prompt,
                     &self.config.model_family,
                     &self.client,
-                    &self.provider,
+                    &provider,
                     &self.otel_event_manager,
                 )
                 .await?;
@@ -294,14 +300,17 @@ impl ModelClient {
         // Always fetch the latest auth in case a prior attempt refreshed the token.
         let auth = auth_manager.as_ref().and_then(|m| m.auth());
 
+        let provider = self
+            .provider
+            .with_model_auth_overrides(&self.config.model, auth.as_ref());
+
         trace!(
             "POST to {}: {:?}",
-            self.provider.get_full_url(&auth),
+            provider.get_full_url(&auth),
             serde_json::to_string(payload_json)
         );
 
-        let mut req_builder = self
-            .provider
+        let mut req_builder = provider
             .create_request_builder(&self.client, &auth)
             .await
             .map_err(StreamAttemptError::Fatal)?;
@@ -361,10 +370,11 @@ impl ModelClient {
                         request_id: request_id.clone(),
                     })
                 });
+                let stream_idle_timeout = provider.stream_idle_timeout();
                 tokio::spawn(process_sse(
                     stream,
                     tx_event,
-                    self.provider.stream_idle_timeout(),
+                    stream_idle_timeout,
                     self.otel_event_manager.clone(),
                 ));
 
