@@ -97,7 +97,7 @@ codex exec resume --last "Fix use-after-free issues"
 Only the conversation context is preserved; you must still provide flags to customize Codex behavior.
 
 ```shell
-codex exec --model gpt-5-codex --json "Review the change, look for use-after-free issues"
+codex exec --model gpt-5-pro --json "Review the change, look for use-after-free issues"
 codex exec --model gpt-5 --json resume --last "Fix use-after-free issues"
 ```
 

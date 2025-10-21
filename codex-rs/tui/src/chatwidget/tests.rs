@@ -1091,6 +1091,18 @@ fn model_selection_popup_snapshot() {
 }
 
 #[test]
+fn model_description_supports_gpt5_pro() {
+    assert_eq!(
+        ChatWidget::model_description_for("gpt-5-pro"),
+        Some("Premium GPT-5 reasoning with extended depth and tools."),
+    );
+    assert_eq!(
+        ChatWidget::model_description_for("gpt-5-pro-latest"),
+        Some("Premium GPT-5 reasoning with extended depth and tools."),
+    );
+}
+
+#[test]
 fn approvals_selection_popup_snapshot() {
     let (mut chat, _rx, _op_rx) = make_chatwidget_manual();
 
@@ -1130,6 +1142,23 @@ fn model_reasoning_selection_popup_snapshot() {
 
     let popup = render_bottom_popup(&chat, 80);
     assert_snapshot!("model_reasoning_selection_popup", popup);
+}
+
+#[test]
+fn model_reasoning_selection_popup_gpt5_pro_snapshot() {
+    let (mut chat, _rx, _op_rx) = make_chatwidget_manual();
+
+    chat.config.model = "gpt-5-pro".to_string();
+    chat.config.model_reasoning_effort = Some(ReasoningEffortConfig::Medium);
+
+    let presets = builtin_model_presets(None)
+        .into_iter()
+        .filter(|preset| preset.model == "gpt-5-pro")
+        .collect::<Vec<_>>();
+    chat.open_reasoning_popup("gpt-5-pro".to_string(), presets);
+
+    let popup = render_bottom_popup(&chat, 80);
+    assert_snapshot!("model_reasoning_selection_popup_gpt5_pro", popup);
 }
 
 #[test]

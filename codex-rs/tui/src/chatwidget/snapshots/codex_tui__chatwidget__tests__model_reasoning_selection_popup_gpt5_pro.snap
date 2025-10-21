@@ -1,0 +1,11 @@
+---
+source: tui/src/chatwidget/tests.rs
+assertion_line: 1161
+expression: popup
+---
+  Select Reasoning Level for gpt-5-pro
+
+› 1. Medium (default) (current)  Premium GPT-5 reasoning with extended depth
+                                 and tools.
+
+  Press enter to confirm or esc to go back

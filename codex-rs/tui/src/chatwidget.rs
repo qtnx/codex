@@ -303,6 +303,8 @@ impl ChatWidget {
     fn model_description_for(slug: &str) -> Option<&'static str> {
         if slug.starts_with("gpt-5-codex") {
             Some("Optimized for coding tasks with many tools.")
+        } else if slug.starts_with("gpt-5-pro") {
+            Some("Premium GPT-5 reasoning with extended depth and tools.")
         } else if slug.starts_with("gpt-5") {
             Some("Broad world knowledge with strong general reasoning.")
         } else {
@@ -1783,7 +1785,8 @@ impl ChatWidget {
                 });
 
             let warning = "⚠ High reasoning effort can quickly consume Plus plan rate limits.";
-            let show_warning = model_slug == "gpt-5-codex" && effort == ReasoningEffortConfig::High;
+            let show_warning = matches!(model_slug.as_str(), "gpt-5-codex" | "gpt-5-pro")
+                && effort == ReasoningEffortConfig::High;
             let selected_description = show_warning.then(|| {
                 description
                     .as_ref()
